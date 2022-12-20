@@ -39,7 +39,7 @@ class BsInd {
       out += std::string(nzcToString(nzcA[i])) + " x ";
       out += std::string(nzcToString(nzcB[i])) + '\n';
 //      if (i+1 == nzcC.size()); // do nothing for the last element
-//			else if (nzcC[i] == nzcC[i+1]) out += " + ";
+//      else if (nzcC[i] == nzcC[i+1]) out += " + ";
 //      else out += '\n' + std::string(nzcToString(nzcC[i])) + " = ";
     }
     out.pop_back();
@@ -202,7 +202,7 @@ inline BsInd getIndices( std::vector< std::vector<size_t> > _nzcB
                          , _nzcA.end()
                          , [t](std::vector<size_t> i) {return i.back() == t;}
                          );
-	  assert(p != _nzcA.end());
+    assert(p != _nzcA.end());
     cind.nzcA.push_back(*p);
     cind.tasks[id][1] = std::distance(_nzcA.begin(), p);
   }
