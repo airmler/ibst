@@ -50,6 +50,7 @@ class Tensor {
       );
     }
     std::sort(idx.begin(), idx.end());
+    assert(idx.size() == ref.size());
     assert(idx == ref);
   };
 
@@ -136,6 +137,16 @@ class Tensor {
                                 , (F *) data.data()
                                 );
     }
+  }
+
+  void read(F &data) {
+    assert(nBlocks == 1);
+    assert(elements == 1);
+    std::vector<int64_t> global_idx(1);
+    std::vector<F> vdata(1);
+    int64_t npair(1);
+    this->tensors[0]->read_all(vdata.data());
+    data = vdata[0];
   }
 
 
