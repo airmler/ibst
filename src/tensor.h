@@ -190,7 +190,9 @@ public:
     if (verbose)
       cind.print();
     // if we dont allow dublicates all elements of the tensor are involved
-    double ops(elements);
+    double ops(traits::is_complex<F>() ? 2.0 : 1.0);
+    ops *= elements;
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     for (auto t : cind.tasks) {
@@ -219,7 +221,9 @@ public:
     if (verbose)
       cind.print();
     // if we dont allow dublicates all elements of the tensor are involved
-    double ops(elements);
+    double ops(traits::is_complex<F>() ? 2.0 : 1.0);
+    ops *= elements;
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     for (auto t : cind.tasks) {
@@ -249,7 +253,9 @@ public:
     if (verbose)
       cind.print();
     // if we dont allow dublicates all elements of the tensor are involved
-    double ops(elements);
+    double ops(traits::is_complex<F>() ? 2.0 : 1.0);
+    ops *= elements;
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     for (auto t : cind.tasks) {
@@ -279,7 +285,9 @@ public:
     if (verbose)
       cind.print();
     // if we dont allow dublicates all elements of the tensor are involved
-    double ops(elements);
+    double ops(traits::is_complex<F>() ? 2.0 : 1.0);
+    ops *= elements;
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     for (auto t : cind.tasks) {
@@ -304,23 +312,25 @@ public:
                 F beta,
                 const std::string cidxC,
                 bool verbose = false) {
+    assert(cidxC.size() == this->lens.size() && cidxA.size() == A.lens.size() && cidxB.size() == B.lens.size());
     std::string cs(name + "[" + cidxC + "] = " + A.name + "[" + cidxA + "] * "
                    + B.name + "[" + cidxB + "]");
     auto cind = getIndices(this->nzc, cidxC, A.nzc, cidxA, B.nzc, cidxB, cs);
     if (verbose)
       cind.print();
-    // currently we only allow contractions where all lhs indices appear on the
-    // rhs once. all other indices on the rhs appear on both operands once in
-    // this case the number of operations is: elements of C times product of the
-    // contracting indices
-    double ops(elements);
-    for (size_t a(0); a < A.order; a++)
-      for (size_t b(0); b < B.order; b++)
-        if (cidxA[a] == cidxB[b])
-          ops *= A.lens[a];
+    // currently we dont allow dublicated indices on one tensor
+    double ops(traits::is_complex<F>() ? 8 : 2);
+    //ops *= traits::is_complex<F>() ? 8 : 2;
+    std::string idx(cidxA+cidxB+cidxC);
+    std::sort(idx.begin(), idx.end());
+    idx.erase( std::unique( idx.begin(), idx.end() ), idx.end() );
+    std::map<char, int64_t> dimMap;
+    for (size_t c(0); c < lens.size(); c++)   dimMap[cidxC[c]] = lens[c];
+    for (size_t a(0); a < A.lens.size(); a++) dimMap[cidxA[a]] = A.lens[a];
+    for (size_t b(0); b < B.lens.size(); b++) dimMap[cidxB[b]] = B.lens[b];
 
-    ops *= traits::is_complex<F>() ? 8 : 2;
-
+    for (auto c: idx) ops *= dimMap[c];
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     // If beta is not equal one. We scale the target Tensor once
@@ -360,8 +370,9 @@ public:
     auto cind = getIndices(this->nzc, A.nzc, cs);
     if (verbose)
       cind.print();
-    double ops(1.0);
+    double ops(traits::is_complex<F>() ? 2.0 : 1.0);
     for (size_t i(0); i < begins.size(); i++) ops *= ends[i] - begins[i];
+    ops *= cind.tasks.size();
 
     auto start = chrono::high_resolution_clock::now();
     for (auto t : cind.tasks) {

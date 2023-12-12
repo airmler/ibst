@@ -61,7 +61,7 @@ public:
       out += _FORMAT("%-48s: ", _line.c_str());
     }
     if (_memoryUsage != 0) {
-      out += _FORMAT("Δmem %6.4f (GB/rank), ", 9.3132e-10 *  _memoryUsage / np );
+      out += _FORMAT("mem %6.4f (GB/rank), ", 9.3132e-10 *  _memoryUsage / np );
       out += _FORMAT("hwm %6.4f (GB/rank)" , 9.3132e-10 * hwm / np );
     }
     if (_flopCount > 0.0) {

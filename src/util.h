@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <complex>
+#include <iostream>
 
 namespace ibst {
 
